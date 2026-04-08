@@ -47,7 +47,7 @@ const Dashboard = ({ results }) => {
   }
 
   // Normal Dataset Dashboard Logic
-  const { kpis, trends, top_products, external_context } = results;
+  const { kpis, trends, top_products, external_context, seasonal_intelligence } = results;
 
   return (
     <div className="space-y-6">
@@ -75,12 +75,63 @@ const Dashboard = ({ results }) => {
           </div>
       )}
 
-      {/* Rest of traditional dashboard component ... (since user explicitly wants to enhance App.jsx workflow, we re-hook the dashboard logic) */}
+      {/* Seasonal and Trending Intelligence System */}
+      {seasonal_intelligence && (
+          <div className="premium-card overflow-hidden">
+              <div className="bg-gradient-to-r from-emerald-600 to-teal-500 p-6 text-white">
+                  <div className="flex items-center justify-between mb-4">
+                      <div>
+                         <h3 className="text-2xl font-bold flex items-center gap-2">
+                            <CalendarDays size={24} /> Seasonal Intelligence
+                         </h3>
+                         <p className="text-emerald-100 font-medium mt-1">AI-Powered Quarterly Strategy Engine</p>
+                      </div>
+                      <div className="bg-white/20 backdrop-blur pb-1 pt-1 pl-4 pr-4 rounded-full border border-white/30 text-center">
+                         <span className="text-xs uppercase tracking-wider font-bold text-emerald-50">Current Season</span>
+                         <p className="text-lg font-black">{seasonal_intelligence.season}</p>
+                      </div>
+                  </div>
+                  <p className="text-sm bg-black/20 p-3 rounded-lg border border-black/10 inline-block font-medium">
+                      {seasonal_intelligence.quarterly_strategy}
+                  </p>
+              </div>
+
+              <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6 bg-slate-50">
+                  {/* Trending Products */}
+                  <div>
+                      <h4 className="text-sm uppercase tracking-wider font-bold text-slate-500 mb-4">🔥 Trending Products</h4>
+                      <div className="space-y-3">
+                          {seasonal_intelligence.trending_products.map((item, idx) => (
+                              <div key={idx} className="flex items-center justify-between bg-white p-3 rounded-lg shadow-sm border border-slate-100">
+                                  <span className="font-bold text-slate-700">{item.product}</span>
+                                  <span className="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-1 rounded-full">{item.growth}</span>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+
+                  {/* Profit Optimization Recommendations */}
+                  <div>
+                      <h4 className="text-sm uppercase tracking-wider font-bold text-slate-500 mb-4">💼 Management Recommendations</h4>
+                      <div className="space-y-3">
+                          {seasonal_intelligence.recommended_actions.map((action, idx) => (
+                              <div key={idx} className="flex gap-3 bg-white p-3 rounded-lg shadow-sm border border-slate-100">
+                                  <div className="text-primary mt-0.5"><Eye size={16} /></div>
+                                  <p className="text-sm font-medium text-slate-700">{action}</p>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+              </div>
+          </div>
+      )}
+
+      {/* Rest of traditional dashboard component */}
       <div className="premium-card p-6">
           <h3 className="text-lg font-bold text-slate-800 mb-6">Top Performers Overview</h3>
           <div className="space-y-4">
             {top_products.map((p, idx) => (
-              <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+              <div key={idx} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-bold text-slate-400">#{idx + 1}</span>
                   <p className="font-bold text-slate-700">{p.product}</p>
