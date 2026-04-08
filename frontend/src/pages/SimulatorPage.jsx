@@ -10,17 +10,40 @@ const SimulatorPage = () => {
   
   if (!dataLoaded) return <Navigate to="/upload" replace />;
 
+  const [selectedProduct, setSelectedProduct] = useState("");
+  const [priceAdjust, setPriceAdjust] = useState("");
+  const [stockAdjust, setStockAdjust] = useState("");
+
   const handleSimulate = (e) => {
       e.preventDefault();
       setLoading(true);
+      
       setTimeout(() => {
+          // Dynamic calculation based on dataset
+          const productData = results?.top_products?.find(p => p.product === selectedProduct) || results?.top_products?.[0];
+          const baseSales = productData ? productData.sales : 10000;
+          
+          const pAdjustNum = parseFloat(priceAdjust) || 0;
+          const sAdjustNum = parseFloat(stockAdjust) || 0;
+          
+          // Basic Elasticity Engine: -1% price = +1.5% demand
+          const elasticity = -1.5; 
+          const demandChangePct = (pAdjustNum * elasticity) + (sAdjustNum > 0 ? 2 : 0);
+          
+          // New Revenue = Base * (1 + DemandShift) * (1 + PriceShift)
+          const newRevenue = baseSales * (1 + (demandChangePct / 100)) * (1 + (pAdjustNum / 100));
+          const revenueImpact = newRevenue - baseSales;
+          
+          const sign = revenueImpact >= 0 ? "+" : "";
+          const dSign = demandChangePct >= 0 ? "+" : "";
+
           setSimResults({
-              revenueImpact: "+$2,450.00",
-              demandImpact: "+18%",
-              riskScore: "Low"
+              revenueImpact: `${sign}$${Math.abs(revenueImpact).toLocaleString(undefined, {maximumFractionDigits: 0})}`,
+              demandImpact: `${dSign}${demandChangePct.toFixed(1)}%`,
+              riskScore: Math.abs(pAdjustNum) > 20 || sAdjustNum < 0 ? "High" : "Low"
           });
           setLoading(false);
-      }, 1000);
+      }, 800);
   }
 
   return (
@@ -36,18 +59,18 @@ const SimulatorPage = () => {
                <form onSubmit={handleSimulate} className="space-y-6">
                    <div>
                        <label className="block text-sm font-bold text-slate-700 mb-2">Target Product</label>
-                       <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-primary outline-none">
-                           {results?.top_products?.map(p => <option key={p.product}>{p.product}</option>)}
+                       <select value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-primary outline-none">
+                           {results?.top_products?.map(p => <option key={p.product} value={p.product}>{p.product}</option>)}
                        </select>
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                        <div>
                            <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-1"><Percent size={14}/> Price Adjust</label>
-                           <input type="number" placeholder="-10%" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-primary outline-none" />
+                           <input type="number" value={priceAdjust} onChange={(e) => setPriceAdjust(e.target.value)} placeholder="-10" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-primary outline-none" />
                        </div>
                        <div>
                            <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-1"><Box size={14}/> Stock Adjust</label>
-                           <input type="number" placeholder="+50 units" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-primary outline-none" />
+                           <input type="number" value={stockAdjust} onChange={(e) => setStockAdjust(e.target.value)} placeholder="+50 units" className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-primary outline-none" />
                        </div>
                    </div>
                    <button type="submit" disabled={loading} className="w-full btn-primary flex justify-center items-center gap-2">
