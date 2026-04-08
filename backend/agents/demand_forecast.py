@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
 
-def forecast_demand(df: pd.DataFrame, days_to_predict=7):
+def forecast_demand(df: pd.DataFrame, days_to_predict=30):
     """
     Demand Forecast Agent: 
-    - Uses a simple Linear Regression model
-    - Predicts future demand for the next 7-30 days
+    - Uses Polynomial Regression (Degree 2)
+    - Injects Weekly Seasonality
+    - Returns 30 days of predictions + Last 14 days of history
     """
     predictions = {}
     
@@ -31,31 +31,45 @@ def forecast_demand(df: pd.DataFrame, days_to_predict=7):
         # Create a date ordinal for regression
         df_copy['date_ordinal'] = df_copy[date_col].apply(lambda x: x.toordinal())
         
-        products = df_copy[prod_col].unique()
-        
-        # We will only forecast for the top 10 products to save time
-        top_products = df_copy.groupby(prod_col)[qty_col].sum().sort_values(ascending=False).head(10).index
+        # We will only forecast for the top 5 products to save time and UI space
+        top_products = df_copy.groupby(prod_col)[qty_col].sum().sort_values(ascending=False).head(5).index
         
         for p in top_products:
-            p_data = df_copy[df_copy[prod_col] == p].sort_values(by='date_ordinal')
-            if len(p_data) < 3:
+            p_data = df_copy[df_copy[prod_col] == p].copy()
+            
+            # Group by day so we get total daily quantity
+            daily_data = p_data.groupby('date_ordinal')[qty_col].sum().reset_index().sort_values('date_ordinal')
+            
+            if len(daily_data) < 7:
                 continue # Not enough data
             
-            X = p_data[['date_ordinal']]
-            y = p_data[qty_col]
+            X = daily_data['date_ordinal'].values
+            y = daily_data[qty_col].values
             
-            model = LinearRegression()
-            model.fit(X, y)
+            # Fit Polynomial (degree 2) to capture trends
+            coeffs = np.polyfit(X, y, 2)
+            poly = np.poly1d(coeffs)
             
-            last_date = p_data['date_ordinal'].max()
-            future_dates = np.array([last_date + i for i in range(1, days_to_predict + 1)]).reshape(-1, 1)
-            future_demand = model.predict(future_dates)
+            last_date = X[-1]
+            future_dates_ordinal = np.array([last_date + i for i in range(1, days_to_predict + 1)])
             
-            # Formatting outputs
+            base_future_demand = poly(future_dates_ordinal)
+            
+            # Inject weekly seasonality (amplitude approx 10% of base prediction)
+            seasonality = np.sin((future_dates_ordinal - last_date) * (2 * np.pi / 7)) * (np.abs(base_future_demand) * 0.1)
+            
+            future_demand = base_future_demand + seasonality
+            
+            # Format outputs ensuring no negative values
             daily_predictions = [max(0, float(val)) for val in future_demand]
+            
+            # Extract up to 14 days of historical actuals
+            history = list(y[-14:])
+            
             predictions[str(p)] = {
-                "total_predicted_demand": sum(daily_predictions),
-                "daily": daily_predictions
+                "total_predicted_demand": sum(daily_predictions[:7]), # Primary 7 day outlook KPI
+                "daily": daily_predictions,
+                "history": [float(h) for h in history]
             }
             
     return predictions
