@@ -1,5 +1,5 @@
 import { CloudLightning, CalendarDays, Camera, BadgeAlert, LocateFixed, Eye, Store, MapPin, TrendingUp, DollarSign, Users } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Legend, Cell } from 'recharts';
 import { useAppContext } from '../context/AppContext';
 
 const Dashboard = ({ results }) => {
@@ -280,6 +280,108 @@ const Dashboard = ({ results }) => {
                       </div>
                   </div>
 
+              </div>
+          </div>
+      )}
+
+      {/* COMPETITOR BENCHMARKING SYSTEM */}
+      {collaboration_intelligence && collaboration_intelligence.competitors && (
+          <div className="premium-card overflow-hidden border-2 border-rose-100 mt-8 mb-8">
+              <div className="bg-gradient-to-r from-rose-500 to-orange-500 p-6 text-white">
+                  <h3 className="text-2xl font-bold flex items-center gap-2">
+                      <TrendingUp size={24} /> Competitor Benchmarking
+                  </h3>
+                  <p className="text-rose-100 font-medium mt-1">Live market comparison against Top 3 local competitors</p>
+              </div>
+
+              <div className="p-6 bg-slate-50 space-y-8">
+                  {/* Competitor List */}
+                  <div>
+                      <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                          <Store size={18} /> Active Competitors Tracked
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {collaboration_intelligence.competitors.map((c, idx) => (
+                              <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-rose-300 transition-colors">
+                                  <div className="flex justify-between items-start mb-2">
+                                      <h5 className="font-bold text-lg text-rose-700">{c.name}</h5>
+                                      <span className="bg-rose-50 text-rose-600 text-xs font-bold px-2 py-1 rounded">{c.location}</span>
+                                  </div>
+                                  <div className="space-y-1 text-sm font-medium text-slate-600">
+                                      <p className="font-bold text-slate-800 flex justify-between"><span>Sales:</span> <span>{c.monthly_sales}</span></p>
+                                      <p className="flex justify-between"><span>Avg Price:</span> <span className="text-emerald-600">{c.avg_price}</span></p>
+                                      <div className="pt-2 flex items-center justify-between">
+                                          <span className="text-xs uppercase font-bold text-slate-400">Stock</span>
+                                          <span className={`text-[10px] font-black uppercase px-2 py-1 rounded ${c.stock === 'High' ? 'bg-emerald-100 text-emerald-700' : c.stock === 'Medium' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}`}>
+                                              {c.stock} Level
+                                          </span>
+                                      </div>
+                                  </div>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                      {/* Market Comparison Chart */}
+                      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                          <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-6 flex items-center gap-2">
+                              <TrendingUp size={18} /> Market Sales Comparison
+                          </h4>
+                          <div className="h-64 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={collaboration_intelligence.competitor_sales_chart}>
+                                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dy={10} />
+                                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dx={-10} tickFormatter={(val) => `$${val/1000}k`} />
+                                      <RechartsTooltip 
+                                          cursor={{fill: '#f1f5f9'}}
+                                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                          formatter={(value) => [`$${value.toLocaleString()}`, 'Monthly Sales']}
+                                      />
+                                      <Bar dataKey="sales" radius={[4, 4, 0, 0]}>
+                                          {
+                                              collaboration_intelligence.competitor_sales_chart.map((entry, index) => (
+                                                  <Cell key={`cell-${index}`} fill={entry.name === 'Your Store' ? '#e11d48' : '#cbd5e1'} />
+                                              ))
+                                          }
+                                      </Bar>
+                                  </BarChart>
+                              </ResponsiveContainer>
+                          </div>
+                      </div>
+
+                      {/* Strategic Benchmarking */}
+                      <div className="space-y-6">
+                           <div>
+                              <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                                  <Eye size={18} /> Market Intelligence Insights
+                              </h4>
+                              <div className="space-y-3">
+                                  {collaboration_intelligence.competitor_insights.map((insight, idx) => (
+                                      <div key={idx} className="flex gap-3 items-center bg-rose-50/50 p-4 rounded-xl border border-rose-100 shadow-sm">
+                                          <div className="p-2 bg-rose-100 rounded-lg text-rose-600"><TrendingUp size={20} /></div>
+                                          <p className="text-sm font-bold text-slate-700">{insight}</p>
+                                      </div>
+                                  ))}
+                              </div>
+                           </div>
+
+                           <div>
+                               <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                                   <BadgeAlert size={18} /> Strategic Recommendations
+                               </h4>
+                               <div className="space-y-3">
+                                   {collaboration_intelligence.competitor_recommendations.map((rec, idx) => (
+                                       <div key={idx} className="flex gap-3 items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500">
+                                           <div className="mt-0.5 text-rose-500">•</div>
+                                           <p className="text-sm font-bold text-slate-700">{rec}</p>
+                                       </div>
+                                   ))}
+                               </div>
+                           </div>
+                      </div>
+                  </div>
               </div>
           </div>
       )}

@@ -95,6 +95,32 @@ class CollaborationAgent:
         recommendations.append("Maintain optimal pricing dynamically based on network average")
         recommendations.append("Promote trending items using unified marketing campaigns")
 
+        # --- NEW: Competitor Benchmarking System ---
+        competitors = [
+            {"name": "TechMart", "location": "Local Radius", "category": "General Tech", "monthly_sales": "$38,000", "avg_price": "$115", "stock": "High"},
+            {"name": "GadgetWorld", "location": "Online / Regional", "category": "Accessories", "monthly_sales": "$52,000", "avg_price": "$90", "stock": "Medium"},
+            {"name": "SmartBuy", "location": "City Center", "category": "Electronics", "monthly_sales": "$41,000", "avg_price": "$105", "stock": "Low"}
+        ]
+        
+        competitor_sales_chart = [
+            {"name": "Your Store", "sales": 32000},
+            {"name": "TechMart", "sales": 38000},
+            {"name": "SmartBuy", "sales": 41000},
+            {"name": "GadgetWorld", "sales": 52000}
+        ]
+        
+        competitor_insights = [
+            "Your overall sales are ~24% lower than the main market average.",
+            "Competitors are aggressively stocking up on premium accessories.",
+            "Market demand for smart devices is currently at a 3-month peak."
+        ]
+        
+        competitor_recommendations = [
+            "Reduce standard pricing by 8-12% to recapture local market share.",
+            "Increase inventory reserves for high-demand category leaders.",
+            "Adopt dynamic pricing similar to GadgetWorld's accessory lines."
+        ]
+        
         return {
             "network_size": network_size,
             "category": category,
@@ -103,5 +129,10 @@ class CollaborationAgent:
             "sales_growth": sales_growth,
             "product_level_data": product_level_data,
             "shared_insights": insights,
-            "ai_recommendations": recommendations
+            "ai_recommendations": recommendations,
+            # Competitor Payload
+            "competitors": competitors,
+            "competitor_sales_chart": competitor_sales_chart,
+            "competitor_insights": competitor_insights,
+            "competitor_recommendations": competitor_recommendations
         }
