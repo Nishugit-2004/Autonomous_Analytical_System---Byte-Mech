@@ -1,4 +1,5 @@
-import { CloudLightning, CalendarDays, Camera, BadgeAlert, LocateFixed, Eye } from 'lucide-react';
+import { CloudLightning, CalendarDays, Camera, BadgeAlert, LocateFixed, Eye, Store, MapPin, TrendingUp, DollarSign, Users } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
 
 const Dashboard = ({ results }) => {
   if (!results) return null;
@@ -75,84 +76,133 @@ const Dashboard = ({ results }) => {
           </div>
       )}
 
-      {/* Product Collaboration Insights */}
+      {/* COLLABORATION HUB */}
       {collaboration_intelligence && (
-          <div className="premium-card overflow-hidden border-2 border-indigo-100">
-              <div className="bg-gradient-to-r from-indigo-600 to-violet-500 p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div>
-                      <h3 className="text-2xl font-bold flex items-center gap-2">
-                          <Eye size={24} /> Product Collaboration Insights
-                      </h3>
-                      <p className="text-indigo-100 font-medium mt-1">
-                          Live Intelligence across {collaboration_intelligence.network_size} retailers in {collaboration_intelligence.category}
-                      </p>
+          <div className="premium-card overflow-hidden border-2 border-indigo-100 mt-8">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 p-8 text-white relative overflow-hidden">
+                  <div className="absolute top-0 right-0 p-8 opacity-10">
+                      <Users size={120} />
                   </div>
-                  <div className="flex gap-2">
-                       <span className="bg-white/20 px-4 py-2 rounded-lg font-bold text-sm backdrop-blur border border-white/30 text-white shadow-sm">
-                           {collaboration_intelligence.network_size} Collaborators
-                       </span>
+                  <div className="relative z-10">
+                      <h3 className="text-3xl font-extrabold flex items-center gap-3">
+                          <Users size={32} /> Collaboration Hub
+                      </h3>
+                      <p className="text-indigo-100 font-medium mt-2 text-lg">
+                          Shared network intelligence across {collaboration_intelligence.network_size} retailers inside {collaboration_intelligence.category}
+                      </p>
                   </div>
               </div>
 
-              <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-6 bg-slate-50">
-                  {/* Shared Product Intelligence & Recommendations */}
-                  <div className="xl:col-span-1 space-y-6">
-                      <div>
-                          <h4 className="text-sm uppercase tracking-wider font-bold text-slate-500 mb-3">📡 Shared Intelligence</h4>
-                          <div className="space-y-2">
-                              {collaboration_intelligence.shared_insights.map((insight, idx) => (
-                                  <div key={idx} className="flex gap-2 items-start bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
-                                      <div className="text-indigo-500 mt-0.5">•</div>
-                                      <p className="text-sm font-medium text-slate-700">{insight}</p>
+              <div className="p-6 bg-slate-50 space-y-8">
+                  {/* 1. Collaborator List */}
+                  <div>
+                      <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                          <Store size={18} /> Network Collaborators
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {collaboration_intelligence.collaborators.map((c, idx) => (
+                              <div key={idx} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                                  <div className="flex justify-between items-start mb-2">
+                                      <h5 className="font-bold text-lg text-indigo-700">{c.name}</h5>
+                                      <span className="bg-indigo-50 text-indigo-600 text-xs font-bold px-2 py-1 rounded">{c.category}</span>
                                   </div>
-                              ))}
-                          </div>
+                                  <div className="space-y-1 text-sm font-medium text-slate-600">
+                                      <p className="flex items-center gap-2"><MapPin size={14} className="text-slate-400"/> {c.location}</p>
+                                      <p className="flex items-center gap-2"><DollarSign size={14} className="text-emerald-500"/> Sales: {c.monthly_sales}</p>
+                                      <p className="mt-2 text-xs text-slate-400 font-semibold uppercase tracking-wider">Top: {c.key_products.join(', ')}</p>
+                                  </div>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                      {/* 2. & 3. Product-Based Collaboration & Insights */}
+                      <div className="space-y-6">
+                           <div>
+                              <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                                  <Eye size={18} /> Shared Product Insights
+                              </h4>
+                              <div className="space-y-3">
+                                  {collaboration_intelligence.shared_insights.map((insight, idx) => (
+                                      <div key={idx} className="flex gap-3 items-center bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 shadow-sm">
+                                          <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600"><TrendingUp size={20} /></div>
+                                          <p className="text-sm font-bold text-slate-700">{insight}</p>
+                                      </div>
+                                  ))}
+                              </div>
+                           </div>
+
+                           <div>
+                               <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                                   <BadgeAlert size={18} /> Management Recommendations
+                               </h4>
+                               <div className="space-y-3">
+                                   {collaboration_intelligence.ai_recommendations.map((rec, idx) => (
+                                       <div key={idx} className="flex gap-3 items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                                           <p className="text-sm font-bold text-slate-700">{rec}</p>
+                                       </div>
+                                   ))}
+                               </div>
+                           </div>
                       </div>
 
-                      <div>
-                          <h4 className="text-sm uppercase tracking-wider font-bold text-slate-500 mb-3">💡 Collaborative Actions</h4>
-                          <div className="space-y-2">
-                              {collaboration_intelligence.ai_recommendations.map((rec, idx) => (
-                                  <div key={idx} className="flex gap-2 items-start bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
-                                      <div className="text-emerald-500 mt-0.5"><BadgeAlert size={14} /></div>
-                                      <p className="text-sm font-medium text-slate-700">{rec}</p>
+                      {/* 4. Sales Growth Visualization */}
+                      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                          <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-6 flex items-center gap-2">
+                              <TrendingUp size={18} /> Sales Growth After Collaboration
+                          </h4>
+                          <div className="h-64 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                  <LineChart data={collaboration_intelligence.sales_growth.labels.map((label, i) => ({
+                                      name: label,
+                                      'Before Collaboration': collaboration_intelligence.sales_growth.before_collaboration[i],
+                                      'After Collaboration': collaboration_intelligence.sales_growth.after_collaboration[i],
+                                  }))}>
+                                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dy={10} />
+                                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#64748b'}} dx={-10} tickFormatter={(val) => `$${val/1000}k`} />
+                                      <RechartsTooltip 
+                                          contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                          formatter={(value) => [`$${value.toLocaleString()}`, undefined]}
+                                      />
+                                      <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '20px' }} />
+                                      <Line type="monotone" dataKey="Before Collaboration" stroke="#94a3b8" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                                      <Line type="monotone" dataKey="After Collaboration" stroke="#6366f1" strokeWidth={4} dot={{ r: 5 }} activeDot={{ r: 8 }} />
+                                  </LineChart>
+                              </ResponsiveContainer>
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* 5. Profit Sharing System */}
+                  <div>
+                      <h4 className="text-sm uppercase tracking-widest font-bold text-slate-500 mb-4 flex items-center gap-2">
+                          <DollarSign size={18} /> Network Profit Distribution
+                      </h4>
+                      <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center gap-8">
+                          <div className="flex-shrink-0 text-center md:text-left">
+                              <p className="text-sm font-bold text-slate-400 uppercase">Total Increased Profit</p>
+                              <p className="text-4xl font-black text-emerald-600 mt-1">${collaboration_intelligence.profit_sharing.total_increased_profit.toLocaleString()}</p>
+                          </div>
+                          
+                          <div className="w-px h-16 bg-slate-200 hidden md:block"></div>
+                          
+                          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-3 gap-4">
+                              {collaboration_intelligence.profit_sharing.breakdown.map((item, idx) => (
+                                  <div key={idx} className="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                                      <div className="flex justify-between items-center mb-2">
+                                          <span className="font-bold text-slate-700">{item.store}</span>
+                                          <span className="text-xs font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">{item.percentage}%</span>
+                                      </div>
+                                      <p className="text-xl font-bold text-slate-800">${item.amount.toLocaleString()}</p>
                                   </div>
                               ))}
                           </div>
                       </div>
                   </div>
 
-                  {/* Comparative Product-Level Analytics */}
-                  <div className="xl:col-span-2 space-y-4">
-                      {collaboration_intelligence.product_level_data.map((item, idx) => (
-                          <div key={idx} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between transition-all hover:border-indigo-300">
-                              <div className="flex-1 w-full">
-                                  <h4 className="font-bold text-lg text-slate-800">{item.product}</h4>
-                                  <div className="flex items-center gap-2 mt-1">
-                                      <span className="text-xs font-black text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded uppercase">Trend: {item.growth}</span>
-                                      <span className={`text-xs font-bold px-2 py-0.5 rounded uppercase ${item.stock_availability === 'Low' ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'}`}>
-                                          Stock: {item.stock_availability}
-                                      </span>
-                                  </div>
-                              </div>
-                              <div className="flex gap-6 w-full md:w-auto mt-4 md:mt-0">
-                                  <div className="text-center md:text-right">
-                                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Your Demand</p>
-                                      <p className="font-black text-slate-700 text-lg">{item.my_demand}</p>
-                                      <p className="text-[10px] sm:text-xs font-semibold text-indigo-500 mt-0.5">Net: {item.network_total_demand}</p>
-                                  </div>
-                                  <div className="w-px bg-slate-200 self-stretch"></div>
-                                  <div className="text-center md:text-right">
-                                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">Your Price</p>
-                                      <p className="font-black text-slate-700 text-lg">${item.my_price}</p>
-                                      <p className="text-[10px] sm:text-xs font-semibold text-rose-500 mt-0.5">
-                                          Avg: ${item.network_avg_price}
-                                      </p>
-                                  </div>
-                              </div>
-                          </div>
-                      ))}
-                  </div>
               </div>
           </div>
       )}
