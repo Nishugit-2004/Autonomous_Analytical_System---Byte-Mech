@@ -187,7 +187,6 @@ const Dashboard = ({ results }) => {
                                   <div className="space-y-1 text-sm font-medium text-slate-600">
                                       <p className="flex items-center gap-2"><MapPin size={14} className="text-slate-400"/> {c.location}</p>
                                       <p className="flex items-center gap-2"><DollarSign size={14} className="text-emerald-500"/> Sales: {c.monthly_sales}</p>
-                                      <p className="mt-2 text-xs text-slate-400 font-semibold uppercase tracking-wider">Top: {c.key_products.join(', ')}</p>
                                   </div>
                               </div>
                           ))}
