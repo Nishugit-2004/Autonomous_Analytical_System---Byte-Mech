@@ -166,7 +166,7 @@ const Dashboard = ({ results }) => {
                           <Users size={32} /> Collaboration Hub
                       </h3>
                       <p className="text-indigo-100 font-medium mt-2 text-lg">
-                          Shared network intelligence across {collaboration_intelligence.network_size} retailers inside {collaboration_intelligence.category}
+                          Shared network intelligence across {collaboration_intelligence.network_size} retailers
                       </p>
                   </div>
               </div>
